@@ -1,6 +1,22 @@
-node_modules/
-.env
-.DS_Store
+# Maven / Java
+target/
+*.class
+*.jar
+*.war
 *.log
+hs_err_pid*
+
+# IDEs
 .idea/
+*.iml
 .vscode/
+.classpath
+.project
+.settings/
+.factorypath
+.sts4/
+
+# OS / env
+.DS_Store
+.env
+*.env

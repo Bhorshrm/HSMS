@@ -11,7 +11,8 @@ export async function apiRequest(path, options = {}) {
         ...options.headers,
       },
     });
-  } catch {
+  } catch (error) {
+    console.error("Fetch failed:", error, "URL:", `${API_BASE_URL}${path}`);
     throw new Error("Can't reach the server. Please try again.");
   }
 

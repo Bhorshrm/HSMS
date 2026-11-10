@@ -39,7 +39,7 @@ class DoctorServiceTest {
     void setUp() {
         standardDoctorOne = doctor(1L, DoctorType.STANDARD);
         standardDoctorTwo = doctor(2L, DoctorType.STANDARD);
-        limitedHoursDoctor = doctor(3L, DoctorType.LIMITED_HOURS);
+        limitedHoursDoctor = doctor(3L, DoctorType.PART_TIME);
         lenient().when(repository.findAll()).thenReturn(
                 List.of(limitedHoursDoctor, standardDoctorTwo, standardDoctorOne));
     }

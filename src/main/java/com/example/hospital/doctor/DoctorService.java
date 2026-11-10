@@ -2,9 +2,12 @@ package com.example.hospital.doctor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -35,24 +38,57 @@ public class DoctorService {
         return repository.save(doctor);
     }
 
+    // public Doctor allocateStandardDoctor(LocalTime appointmentTime, Set<Long> occupiedDoctorIds) {
+    //     if (appointmentTime == null || occupiedDoctorIds == null) {
+    //         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+    //                 "Appointment time and occupied doctor IDs are required");
+    //     }
+    //     if (appointmentTime.isBefore(STANDARD_START_TIME) || appointmentTime.isAfter(STANDARD_END_TIME)) {
+    //         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+    //                 "Standard doctors are available between 9:00 AM and 6:30 PM");
+    //     }
+
+    //     return repository.findAll().stream()
+    //             .filter(doctor -> doctor.getDoctorType() == DoctorType.STANDARD)
+    //             .filter(doctor -> !occupiedDoctorIds.contains(doctor.getId()))
+    //             .sorted((first, second) -> first.getId().compareTo(second.getId()))
+    //             .findFirst()
+    //             .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, FULLY_BOOKED_MESSAGE));
+    // }
+    @Transactional(readOnly = true)
     public Doctor allocateStandardDoctor(LocalTime appointmentTime, Set<Long> occupiedDoctorIds) {
         if (appointmentTime == null || occupiedDoctorIds == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Appointment time and occupied doctor IDs are required");
         }
-        if (appointmentTime.isBefore(STANDARD_START_TIME) || appointmentTime.isAfter(STANDARD_END_TIME)) {
+
+        boolean withinWorkingHours = Arrays.stream(DoctorType.values())
+                .anyMatch(type -> type.isAvailableAt(appointmentTime));
+        if (!withinWorkingHours) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Standard doctors are available between 9:00 AM and 6:30 PM");
+                    "Doctors are available between 9:00 AM and 6:30 PM");
         }
 
-        return repository.findAll().stream()
-                .filter(doctor -> doctor.getDoctorType() == DoctorType.STANDARD)
+        return eligibleDoctors(appointmentTime).stream()
                 .filter(doctor -> !occupiedDoctorIds.contains(doctor.getId()))
-                .sorted((first, second) -> first.getId().compareTo(second.getId()))
-                .findFirst()
+                .min(Comparator
+                        .comparingInt((Doctor d) -> d.getDoctorType().getPriority())
+                        .thenComparing(Doctor::getId))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, FULLY_BOOKED_MESSAGE));
     }
 
+    // All doctors who work at this time, whether or not they are booked
+    private List<Doctor> eligibleDoctors(LocalTime time) {
+        return repository.findAll().stream()
+                .filter(doctor -> doctor.getDoctorType().isAvailableAt(time))
+                .toList();
+    }
+    @Transactional(readOnly = true)
+    public int availableDoctorCount(LocalTime time, Set<Long> occupiedDoctorIds) {
+        return (int) eligibleDoctors(time).stream()
+                .filter(doctor -> !occupiedDoctorIds.contains(doctor.getId()))
+                .count();
+    }
     public Doctor update(Long id, Doctor input) {
         requireDoctorType(input);
         Doctor doctor = findById(id);

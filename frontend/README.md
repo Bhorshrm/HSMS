@@ -4,7 +4,7 @@ Plain HTML, CSS, and JavaScript frontend for the Spring Boot API. No build step 
 
 ## Run locally
 
-1. Start Spring Boot on `http://localhost:8080` and make sure its configured database is available.
+1. Start Spring Boot on `http://localhost:8081` and make sure its configured database is available.
 2. Serve the frontend from the repository root. In VS Code, open `frontend/index.html` and choose **Open with Live Server** (configure its port as `5500`), or use Python if installed:
 
    ```powershell
@@ -18,7 +18,7 @@ The login is only a visual demo; it does not authenticate users or provide autho
 
 ## API mapping
 
-The API base URL is configured in `js/config.js` (default `http://localhost:8080`).
+The API base URL is configured in `js/config.js` (default `http://localhost:8081/api`).
 
 | UI action | API |
 | --- | --- |

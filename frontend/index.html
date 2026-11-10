@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f5f2">
+  <title>HSMS | Hospital management system</title>
+  <link rel="stylesheet" href="./css/styles.css">
+  <script type="module" src="./js/app.js"></script>
+</head>
+<body>
+  <main id="login-view" class="login-layout">
+    <header class="brand brand-login">
+      <h1>HSMS</h1>
+      <p>Hospital management system</p>
+    </header>
+
+    <form id="login-form" class="panel login-panel">
+      <h2>Sign in</h2>
+      <label class="field">
+        <span>Email</span>
+        <input name="email" type="email" placeholder="name@hsms.com" autocomplete="username" required>
+      </label>
+      <label class="field">
+        <span>Password</span>
+        <input name="password" type="password" placeholder="********" autocomplete="current-password" required>
+      </label>
+      <button class="button button-outline" type="submit">Sign in</button>
+      <p class="demo-note">Demo sign-in only. Use <code>?view=staff</code> for the staff layout.</p>
+    </form>
+    <div id="login-message" class="notice notice-error" role="alert" hidden></div>
+  </main>
+
+  <div id="app-view" class="app-layout" hidden>
+    <header class="topbar">
+      <a class="brand brand-compact" href="#" aria-label="HSMS home">HSMS</a>
+      <div class="topbar-actions">
+        <span id="user-badge" class="pill user-badge"></span>
+        <button id="logout-button" class="pill button-quiet" type="button">Logout</button>
+      </div>
+    </header>
+
+    <nav id="admin-tabs" class="tabs" aria-label="Administration sections">
+      <button class="pill tab-button is-active" data-tab="doctors" type="button">Doctors</button>
+      <button class="pill tab-button" data-tab="patients" type="button">Patients</button>
+      <button class="pill tab-button" data-tab="appointments" type="button">Appointments</button>
+    </nav>
+
+    <section id="doctors-panel" class="panel view-panel" aria-labelledby="doctors-heading">
+      <h2 id="doctors-heading">Add doctor</h2>
+      <form id="doctor-form" class="form-grid">
+        <label class="field">
+          <span>First name</span>
+          <input name="firstName" placeholder="Aarav" required>
+        </label>
+        <label class="field">
+          <span>Last name</span>
+          <input name="lastName" placeholder="Sharma" required>
+        </label>
+        <label class="field field-wide">
+          <span>Specialty</span>
+          <input name="specialty" placeholder="Cardiology" required>
+        </label>
+        <label class="field">
+          <span>Email</span>
+          <input name="email" type="email" placeholder="name@hsms.com">
+        </label>
+        <label class="field">
+          <span>Phone</span>
+          <input name="phone" type="tel" placeholder="9810000001">
+        </label>
+        <label class="field field-wide">
+          <span>Doctor type</span>
+          <select name="doctorType" required>
+            <option value="STANDARD">Standard</option>
+            <option value="LIMITED_HOURS">Limited hours</option>
+          </select>
+        </label>
+        <button class="button button-outline field-wide" type="submit">Add doctor</button>
+      </form>
+      <p id="doctors-feedback" class="notice" role="status" hidden></p>
+      <div class="list-heading">
+        <h3>Doctors</h3>
+        <button class="text-button" data-refresh="doctors" type="button">Refresh</button>
+      </div>
+      <div id="doctors-list" class="data-list" aria-live="polite"></div>
+    </section>
+
+    <section id="patients-panel" class="panel view-panel" aria-labelledby="patients-heading" hidden>
+      <h2 id="patients-heading">Add patient</h2>
+      <form id="patient-form" class="form-grid">
+        <label class="field">
+          <span>First name</span>
+          <input name="firstName" placeholder="Rahul" required>
+        </label>
+        <label class="field">
+          <span>Last name</span>
+          <input name="lastName" placeholder="Yadav" required>
+        </label>
+        <label class="field field-wide">
+          <span>Date of birth</span>
+          <input name="dateOfBirth" type="date">
+        </label>
+        <label class="field">
+          <span>Email</span>
+          <input name="email" type="email" placeholder="name@email.com">
+        </label>
+        <label class="field">
+          <span>Phone</span>
+          <input name="phone" type="tel" placeholder="9900000000">
+        </label>
+        <button class="button button-outline field-wide" type="submit">Add patient</button>
+      </form>
+      <p id="patients-feedback" class="notice" role="status" hidden></p>
+      <div class="list-heading">
+        <h3>Patients</h3>
+        <button class="text-button" data-refresh="patients" type="button">Refresh</button>
+      </div>
+      <div id="patients-list" class="data-list" aria-live="polite"></div>
+    </section>
+
+    <section id="appointments-panel" class="panel view-panel" aria-labelledby="appointments-heading" hidden>
+      <h2 id="appointments-heading">Appointments</h2>
+      <form id="appointment-form" class="stack-form">
+        <label class="field">
+          <span>Patient</span>
+          <select name="patientId" required>
+            <option value="" disabled selected>Select patient</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Appointment date and time</span>
+          <input name="appointmentDateTime" type="datetime-local" required>
+        </label>
+        <button class="button button-outline" type="submit">Book appointment</button>
+      </form>
+      <p id="patient-options-hint" class="helper-text" hidden>Add a patient first to book an appointment.</p>
+      <p class="helper-text">The server assigns the next available standard doctor for this time.</p>
+      <div id="appointments-feedback" class="notice" role="status" hidden></div>
+      <div class="list-heading">
+        <h3>Recent bookings</h3>
+        <span class="helper-text">This session</span>
+      </div>
+      <div id="appointments-list" class="data-list" aria-live="polite"></div>
+    </section>
+
+    <div id="global-message" class="notice" role="status" hidden></div>
+  </div>
+</body>
+</html>

@@ -73,7 +73,7 @@ export function initDoctors() {
 
     if (submitVersion !== doctorLoadVersion) return;
     form.reset();
-    showNotice(feedback, "Doctor added.", "success");
+    showNotice(feedback, "Doctors Added Successfully !!", "success");
     void loadDoctors();
   });
 }

@@ -119,9 +119,63 @@ button { cursor: pointer; }
   z-index: 1000;
   top: 24px;
   right: 24px;
-  width: min(440px, calc(100vw - 48px));
+  width: min(420px, calc(100vw - 48px));
+  max-height: calc(100vh - 40px);
+  overflow: auto;
   margin: 0;
-  box-shadow: 0 8px 24px #25252526;
+  padding: 24px 28px 24px 72px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.45;
+  text-align: left;
+  box-shadow: 0 8px 24px #171d2933;
+  opacity: 1;
+  transition: opacity .8s ease, transform .8s ease;
+}
+
+.toast.toast-fading {
+  opacity: 0;
+  transform: translateX(12px);
+}
+
+.toast::before {
+  position: absolute;
+  top: 50%;
+  left: 24px;
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  transform: translateY(-50%);
+}
+
+.toast.notice-success {
+  border-color: #b7df8a;
+  background: var(--green-soft);
+  color: #28530e;
+}
+
+.toast.notice-success::before {
+  background: #4a9d11;
+  content: "✓";
+}
+
+.toast.notice-error {
+  border-color: #f3a5a5;
+  background: var(--red-soft);
+  color: #9f2020;
+}
+
+.toast.notice-error::before {
+  background: #d94b4b;
+  content: "!";
 }
 
 .topbar {

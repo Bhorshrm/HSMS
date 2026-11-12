@@ -1,4 +1,5 @@
 const noticeTimeouts = new WeakMap();
+const noticeFadeTimeouts = new WeakMap();
 
 export function showNotice(element, message, kind = "error") {
   const readableMessage =
@@ -12,7 +13,9 @@ export function showNotice(element, message, kind = "error") {
 
 export function clearNotice(element) {
   window.clearTimeout(noticeTimeouts.get(element));
+  window.clearTimeout(noticeFadeTimeouts.get(element));
   noticeTimeouts.delete(element);
+  noticeFadeTimeouts.delete(element);
   element.textContent = "";
   element.className = "notice";
   element.hidden = true;
@@ -36,6 +39,10 @@ export function showToast(element, message, kind = "success") {
   clearNotice(element);
   showNotice(element, message, kind);
   element.classList.add("toast");
+  noticeFadeTimeouts.set(
+    element,
+    window.setTimeout(() => element.classList.add("toast-fading"), 3000),
+  );
   noticeTimeouts.set(element, window.setTimeout(() => clearNotice(element), 4000));
 }
 

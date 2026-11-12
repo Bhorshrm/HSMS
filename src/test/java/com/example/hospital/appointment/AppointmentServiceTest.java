@@ -157,4 +157,5 @@ class AppointmentServiceTest {
 
         verify(repository, never()).save(any(Appointment.class));
     }
+
 }

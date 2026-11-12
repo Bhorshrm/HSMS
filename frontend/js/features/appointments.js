@@ -76,7 +76,7 @@ export function initAppointments() {
 
     if (bookingSessionVersion !== sessionVersion) return;
     form.elements.appointmentDateTime.value = "";
-    showNotice(feedback, "Appointment booked.", "success");
+    showNotice(feedback, "Appointment Booked Successfully !!", "success");
     if (appointment && typeof appointment === "object") {
       recentAppointments.unshift(appointment);
       try {

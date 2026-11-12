@@ -122,7 +122,7 @@ export function initPatients() {
 
     if (submitVersion !== patientLoadVersion) return;
     form.reset();
-    showToast(toast, "Patient Added", "success");
+    showToast(toast, "Patient Added Successfully !!", "success");
     void loadPatients(0);
     void loadPatientOptions();
   });

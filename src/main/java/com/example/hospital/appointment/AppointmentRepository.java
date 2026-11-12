@@ -8,7 +8,15 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
+    boolean existsByPatient_IdAndAppointmentDateTimeGreaterThanAndAppointmentDateTimeLessThan(
+            Long patientId,
+            LocalDateTime oneHourBefore,
+            LocalDateTime oneHourAfter);
+
     @Query("select appointment.doctor.id from Appointment appointment "
-            + "where appointment.appointmentDateTime = :appointmentDateTime")
-    Set<Long> findOccupiedDoctorIds(@Param("appointmentDateTime") LocalDateTime appointmentDateTime);
+            + "where appointment.appointmentDateTime > :oneHourBefore "
+            + "and appointment.appointmentDateTime < :oneHourAfter")
+    Set<Long> findOccupiedDoctorIds(
+            @Param("oneHourBefore") LocalDateTime oneHourBefore,
+            @Param("oneHourAfter") LocalDateTime oneHourAfter);
 }

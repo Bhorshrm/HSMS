@@ -33,7 +33,7 @@ class AppointmentControllerTest {
     @Test
     void createsAppointmentAndReturnsAssignedDoctor() throws Exception {
         LocalDateTime appointmentDateTime = LocalDateTime.of(2030, 5, 10, 10, 0);
-        when(service.create(7L, appointmentDateTime)).thenReturn(new AppointmentResponse(
+        when(service.create(7L, 3L, appointmentDateTime)).thenReturn(new AppointmentResponse(
                 20L, 7L, "Jamie", "Doe", 3L, "Alex", "Smith", appointmentDateTime));
 
         mockMvc.perform(post("/api/appointments")
@@ -41,6 +41,7 @@ class AppointmentControllerTest {
                         .content("""
                                 {
                                   "patientId": 7,
+                                  "doctorId": 3,
                                   "appointmentDateTime": "2030-05-10T10:00:00"
                                 }
                                 """))
@@ -54,7 +55,7 @@ class AppointmentControllerTest {
         LocalDateTime appointmentDateTime = LocalDateTime.of(2030, 5, 10, 10, 0);
         String message = "current appointments for doctors are fulfilled , schedule appointment "
                 + "at appropriate time tomorrow";
-        when(service.create(7L, appointmentDateTime)).thenThrow(
+        when(service.create(7L, 3L, appointmentDateTime)).thenThrow(
                 new ResponseStatusException(HttpStatus.CONFLICT, message));
 
         mockMvc.perform(post("/api/appointments")
@@ -62,6 +63,7 @@ class AppointmentControllerTest {
                         .content("""
                                 {
                                   "patientId": 7,
+                                  "doctorId": 3,
                                   "appointmentDateTime": "2030-05-10T10:00:00"
                                 }
                                 """))

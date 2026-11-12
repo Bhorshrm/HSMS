@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.time.ZoneId;
 
 @Service
 public class DoctorService {
@@ -61,7 +62,15 @@ public class DoctorService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Appointment time and occupied doctor IDs are required");
         }
+        System.out.println("Received appointment time: " + appointmentTime);
 
+        System.out.println("System timezone: " + ZoneId.systemDefault());
+
+        System.out.println("Standard available: " +
+                DoctorType.STANDARD.isAvailableAt(appointmentTime));
+
+        System.out.println("Part-time available: " +
+                DoctorType.LIMITED_HOURS.isAvailableAt(appointmentTime));
         boolean withinWorkingHours = Arrays.stream(DoctorType.values())
                 .anyMatch(type -> type.isAvailableAt(appointmentTime));
         if (!withinWorkingHours) {
@@ -79,9 +88,13 @@ public class DoctorService {
 
     // All doctors who work at this time, whether or not they are booked
     private List<Doctor> eligibleDoctors(LocalTime time) {
-        return repository.findAll().stream()
-                .filter(doctor -> doctor.getDoctorType().isAvailableAt(time))
-                .toList();
+        // return repository.findAll().stream()
+        //         .filter(doctor -> doctor.getDoctorType().isAvailableAt(time))
+        //         .toList();
+          return repository.findAll().stream()
+            .filter(doctor -> doctor.getDoctorType() == DoctorType.STANDARD)
+            .filter(doctor -> doctor.getDoctorType().isAvailableAt(time))
+            .toList();
     }
     @Transactional(readOnly = true)
     public int availableDoctorCount(LocalTime time, Set<Long> occupiedDoctorIds) {

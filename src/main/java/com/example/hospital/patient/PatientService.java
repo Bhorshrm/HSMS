@@ -9,7 +9,11 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
-
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.dao.DataIntegrityViolationException;
 @Service
 public class PatientService {
     private final PatientRepository repository;
@@ -46,8 +50,24 @@ public class PatientService {
         patient.setPhone(input.getPhone());
         return repository.save(patient);
     }
+    @Transactional(readOnly = true)
+    public Page<Patient> search(String search, Pageable pageable) {
+        String q = search == null ? "" : search.trim();
+        return repository.search(q, pageable);
+    }
 
+    @Transactional(readOnly = true)
+    public List<Patient> listAll() {
+        return repository.findAll(Sort.by("firstName", "lastName"));
+    }
     public void delete(Long id) {
         repository.delete(findById(id));
+         Patient patient = findById(id);
+       try {
+           repository.delete(patient);
+       } catch (DataIntegrityViolationException e) {
+           throw new ResponseStatusException(HttpStatus.CONFLICT,
+                   "This patient has appointments. Delete those appointments first.");
+       }
     }
 }

@@ -1,5 +1,12 @@
 import { apiRequest } from "../api/client.js";
-import { clearNotice, createDataRow, renderRows, setFormBusy, showNotice } from "../ui.js";
+import {
+  clearNotice,
+  createDataRow,
+  initPhoneValidation,
+  renderRows,
+  setFormBusy,
+  showNotice,
+} from "../ui.js";
 
 let doctorLoadVersion = 0;
 
@@ -9,7 +16,12 @@ export async function loadDoctors() {
   container.innerHTML = '<p class="empty-state">Loading doctors...</p>';
   try {
     const doctors = await apiRequest("/api/doctors");
+    console.log("Doctors loaded:", doctors);
     if (loadVersion !== doctorLoadVersion) return;
+
+    // Populate appointment doctor dropdown
+    populateDoctorDropdown(doctors);
+
     renderRows(
       container,
       doctors,
@@ -35,6 +47,7 @@ export function clearDoctorsData() {
 export function initDoctors() {
   const form = document.querySelector("#doctor-form");
   const feedback = document.querySelector("#doctors-feedback");
+  initPhoneValidation(form.elements.phone);
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     clearNotice(feedback);
@@ -63,4 +76,29 @@ export function initDoctors() {
     showNotice(feedback, "Doctor added.", "success");
     void loadDoctors();
   });
+}
+
+export function populateDoctorDropdown(doctors) {
+    const doctorSelect = document.querySelector(
+        'select[name="doctorId"]'
+    );
+
+    if (!doctorSelect) return;
+
+    doctorSelect.innerHTML = `
+        <option value="" disabled selected>Select doctor</option>
+    `;
+
+    doctors.forEach((doctor) => {
+        const option = document.createElement("option");
+
+        option.value = doctor.id;
+        option.textContent =
+            `Dr. ${doctor.firstName} ${doctor.lastName} (${doctor.specialty} · ${
+              doctor.doctorType === "LIMITED_HOURS" ? "2:00-4:00 PM" : "9:00 AM-6:30 PM"
+            })`;
+
+        doctorSelect.appendChild(option);
+    });
+    console.log("Doctor dropdown populated with doctors:", doctors);
 }

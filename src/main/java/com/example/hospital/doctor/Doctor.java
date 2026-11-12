@@ -11,7 +11,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 @Entity
 @Table(name = "doctors")
 public class Doctor {
@@ -20,11 +26,11 @@ public class Doctor {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
 
-    @NotBlank
+    @NotBlank @Size(max = 50)
     @Column(nullable = false)
     private String firstName;
 
-    @NotBlank
+    @NotBlank @Size(max = 50)
     @Column(nullable = false)
     private String lastName;
 
@@ -32,15 +38,33 @@ public class Doctor {
     @Column(nullable = false)
     private String specialty;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     private DoctorType doctorType;
 
     @Email
     @Column(unique = true)
     private String email;
-
+    @NotBlank @Size(max = 20)
     private String phone;
+    @Column(name = "joined_at", nullable = false, updatable = false)
+    private LocalDateTime joinedAt;
 
+    @Column(name = "exited_at")
+    private LocalDateTime exitedAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    void onCreate() {
+        joinedAt = updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
     protected Doctor() {}
 
     public Long getId() { return id; }
@@ -56,4 +80,8 @@ public class Doctor {
     public void setEmail(String email) { this.email = email; }
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
+    public LocalDateTime getJoinedAt() { return joinedAt; }
+    public LocalDateTime getExitedAt() { return exitedAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setExitedAt(LocalDateTime exitedAt) { this.exitedAt = exitedAt; }
 }

@@ -8,7 +8,6 @@ const appView = document.querySelector("#app-view");
 const loginMessage = document.querySelector("#login-message");
 const userBadge = document.querySelector("#user-badge");
 const loginForm = document.querySelector("#login-form");
-const isStaffView = new URLSearchParams(window.location.search).get("view") === "staff";
 
 function showTab(tabName) {
   document.querySelectorAll(".view-panel").forEach((panel) => {
@@ -24,13 +23,10 @@ function showTab(tabName) {
 function showApp(email) {
   loginView.hidden = true;
   appView.hidden = false;
-  document.querySelector("#admin-tabs").hidden = isStaffView;
-  userBadge.textContent = `${email.split("@")[0]}  |  ${isStaffView ? "Staff" : "Admin"}`;
-  showTab(isStaffView ? "appointments" : "doctors");
-  if (!isStaffView) {
-    void loadDoctors();
-    void loadPatients();
-  }
+  userBadge.textContent = email.split("@")[0];
+  showTab("doctors");
+  void loadDoctors();
+  void loadPatients();
   void loadPatientOptions();
 }
 
@@ -65,6 +61,13 @@ document.querySelector("#logout-button").addEventListener("click", () => {
 
 document.querySelectorAll(".tab-button").forEach((button) => {
   button.addEventListener("click", () => {
+    const leavingAppointments =
+      !document.querySelector("#appointments-panel").hidden
+      && button.dataset.tab !== "appointments";
+    if (leavingAppointments) {
+      document.querySelector("#appointment-form").reset();
+      clearNotice(document.querySelector("#appointments-feedback"));
+    }
     showTab(button.dataset.tab);
     if (button.dataset.tab === "appointments") void loadPatientOptions();
   });

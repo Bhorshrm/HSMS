@@ -23,7 +23,7 @@ public class AppointmentController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public AppointmentResponse create(@Valid @RequestBody AppointmentRequest request) {
-        return service.create(request.patientId(), request.appointmentDateTime());
+        return service.create(request.patientId(), request.doctorId(), request.appointmentDateTime());
     }
 
     @ExceptionHandler(ResponseStatusException.class)

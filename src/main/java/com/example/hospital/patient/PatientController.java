@@ -11,7 +11,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.Sort;
 import java.util.List;
 
 @RestController
@@ -22,11 +28,17 @@ public class PatientController {
     public PatientController(PatientService service) {
         this.service = service;
     }
-
+    @GetMapping("/options")
+   public List<Patient> options() {
+       return service.listAll();
+   }
     @GetMapping
-    public List<Patient> findAll() {
-        return service.findAll();
+    public Page<Patient> list(
+            @RequestParam(defaultValue = "") String search,
+            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        return service.search(search, pageable);   // map entity -> DTO with page.map(...)
     }
+   
 
     @GetMapping("/{id}")
     public Patient findById(@PathVariable Long id) {

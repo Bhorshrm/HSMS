@@ -39,7 +39,7 @@ class DoctorServiceTest {
     void setUp() {
         standardDoctorOne = doctor(1L, DoctorType.STANDARD);
         standardDoctorTwo = doctor(2L, DoctorType.STANDARD);
-        limitedHoursDoctor = doctor(3L, DoctorType.PART_TIME);
+        limitedHoursDoctor = doctor(3L, DoctorType.LIMITED_HOURS);
         lenient().when(repository.findAll()).thenReturn(
                 List.of(limitedHoursDoctor, standardDoctorTwo, standardDoctorOne));
     }
@@ -67,14 +67,14 @@ class DoctorServiceTest {
     void acceptsStandardDoctorWorkingHourBoundaries() {
         assertThat(service.allocateStandardDoctor(LocalTime.of(9, 0), Set.of()))
                 .isSameAs(standardDoctorOne);
-        assertThat(service.allocateStandardDoctor(LocalTime.of(18, 30), Set.of()))
+        assertThat(service.allocateStandardDoctor(LocalTime.of(17, 30), Set.of()))
                 .isSameAs(standardDoctorOne);
     }
 
     @Test
     void rejectsAppointmentOutsideStandardDoctorWorkingHours() {
         assertThatThrownBy(() ->
-                service.allocateStandardDoctor(LocalTime.of(18, 31), Set.of()))
+                service.allocateStandardDoctor(LocalTime.of(17, 31), Set.of()))
                 .isInstanceOf(ResponseStatusException.class)
                 .satisfies(exception -> {
                     ResponseStatusException response = (ResponseStatusException) exception;
@@ -82,6 +82,14 @@ class DoctorServiceTest {
                 });
 
         verify(repository, never()).findAll();
+    }
+
+    @Test
+    void oneHourLimitedHoursAppointmentMustFinishByFourPm() {
+        assertThat(DoctorType.LIMITED_HOURS.isAvailableAt(LocalTime.of(14, 0))).isTrue();
+        assertThat(DoctorType.LIMITED_HOURS.isAvailableAt(LocalTime.of(15, 0))).isTrue();
+        assertThat(DoctorType.LIMITED_HOURS.isAvailableAt(LocalTime.of(15, 1))).isFalse();
+        assertThat(DoctorType.LIMITED_HOURS.isAvailableAt(LocalTime.of(16, 0))).isFalse();
     }
 
     @Test

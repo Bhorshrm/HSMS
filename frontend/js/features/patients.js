@@ -1,18 +1,38 @@
 import { apiRequest } from "../api/client.js";
-import { clearNotice, createDataRow, renderRows, setFormBusy, showNotice } from "../ui.js";
+import { createDataRow, initPhoneValidation, renderRows, setFormBusy, showToast } from "../ui.js";
 
 let patientLoadVersion = 0;
+let patientSize = 10;
+let patientPage = 0;
 
-export async function loadPatients() {
+function updatePatientPagination(data) {
+  const previous = document.querySelector("#patients-prev");
+  const next = document.querySelector("#patients-next");
+  const pageInfo = document.querySelector("#patients-page-info");
+  previous.disabled = data.first || data.totalPages === 0;
+  next.disabled = data.last || data.totalPages === 0;
+  pageInfo.textContent = data.totalElements === 0
+    ? "No patients"
+    : `Page ${data.number + 1} of ${data.totalPages} · ${data.totalElements} patients`;
+}
+
+export async function loadPatients(page = patientPage) {
   const loadVersion = patientLoadVersion;
   const container = document.querySelector("#patients-list");
   container.innerHTML = '<p class="empty-state">Loading patients...</p>';
   try {
-    const patients = await apiRequest("/api/patients");
+    const params = new URLSearchParams({
+      page: String(page),
+      size: String(patientSize),
+      sort: "id,desc",
+    });
+    const data = await apiRequest(`/api/patients?${params}`);
     if (loadVersion !== patientLoadVersion) return;
+    patientPage = data.number;
+    updatePatientPagination(data);
     renderRows(
       container,
-      patients,
+      data.content,
       "No patients found. Add a patient above.",
       (patient) =>
         createDataRow(
@@ -23,6 +43,9 @@ export async function loadPatients() {
   } catch (error) {
     if (loadVersion !== patientLoadVersion) return;
     renderRows(container, [], `Could not load patients: ${error.message}`, () => null);
+    document.querySelector("#patients-page-info").textContent = "Could not load pages";
+    document.querySelector("#patients-prev").disabled = true;
+    document.querySelector("#patients-next").disabled = true;
   }
 }
 
@@ -39,7 +62,7 @@ export async function loadPatientOptions() {
   };
   setPlaceholder("Loading patients...", true);
   try {
-    const patients = await apiRequest("/api/patients");
+    const patients = await apiRequest("/api/patients/options");
     if (loadVersion !== patientLoadVersion) return;
     if (patients.length === 0) {
       setPlaceholder("No patients available", true, true);
@@ -64,7 +87,6 @@ export async function loadPatientOptions() {
 export function clearPatientData() {
   patientLoadVersion += 1;
   document.querySelector("#patients-list").replaceChildren();
-  clearNotice(document.querySelector("#patients-feedback"));
   const select = document.querySelector('#appointment-form select[name="patientId"]');
   const placeholder = new Option("Select patient", "", true, true);
   placeholder.disabled = true;
@@ -75,24 +97,24 @@ export function clearPatientData() {
 
 export function initPatients() {
   const form = document.querySelector("#patient-form");
-  const feedback = document.querySelector("#patients-feedback");
+  const toast = document.querySelector("#global-message");
+  initPhoneValidation(form.elements.phone);
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
-    clearNotice(feedback);
     setFormBusy(form, true);
     const submitVersion = patientLoadVersion;
     const patient = Object.fromEntries(new FormData(form));
     for (const key of ["email", "phone", "dateOfBirth"]) {
       if (!patient[key]) delete patient[key];
     }
-    
+
     try {
       await apiRequest("/api/patients", {
         method: "POST",
         body: JSON.stringify(patient),
       });
     } catch (error) {
-      if (submitVersion === patientLoadVersion) showNotice(feedback, error.message, "error");
+      if (submitVersion === patientLoadVersion) showToast(toast, error.message, "error");
       return;
     } finally {
       setFormBusy(form, false);
@@ -100,8 +122,17 @@ export function initPatients() {
 
     if (submitVersion !== patientLoadVersion) return;
     form.reset();
-    showNotice(feedback, "Patient added.", "success");
-    void loadPatients();
+    showToast(toast, "Patient Added", "success");
+    void loadPatients(0);
     void loadPatientOptions();
+  });
+
+  document.querySelector("#patients-prev")
+    .addEventListener("click", () => loadPatients(patientPage - 1));
+  document.querySelector("#patients-next")
+    .addEventListener("click", () => loadPatients(patientPage + 1));
+  document.querySelector("#patients-size").addEventListener("change", (event) => {
+    patientSize = Number(event.target.value);
+    void loadPatients(0);
   });
 }

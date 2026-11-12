@@ -1,3 +1,5 @@
+const noticeTimeouts = new WeakMap();
+
 export function showNotice(element, message, kind = "error") {
   const readableMessage =
     typeof message === "string" && message.trim()
@@ -9,9 +11,32 @@ export function showNotice(element, message, kind = "error") {
 }
 
 export function clearNotice(element) {
+  window.clearTimeout(noticeTimeouts.get(element));
+  noticeTimeouts.delete(element);
   element.textContent = "";
   element.className = "notice";
   element.hidden = true;
+}
+
+export function initPhoneValidation(input) {
+  const error = document.getElementById(input.getAttribute("aria-describedby"));
+  const updateValidation = () => {
+    const invalid = input.validity.patternMismatch;
+    input.setCustomValidity(invalid ? input.title : "");
+    input.setAttribute("aria-invalid", invalid ? "true" : "false");
+    error.hidden = !invalid;
+  };
+
+  input.addEventListener("input", updateValidation);
+  input.addEventListener("blur", updateValidation);
+  updateValidation();
+}
+
+export function showToast(element, message, kind = "success") {
+  clearNotice(element);
+  showNotice(element, message, kind);
+  element.classList.add("toast");
+  noticeTimeouts.set(element, window.setTimeout(() => clearNotice(element), 4000));
 }
 
 export function setFormBusy(form, busy) {

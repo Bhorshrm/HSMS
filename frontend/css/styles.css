@@ -85,6 +85,7 @@ button { cursor: pointer; }
 
 .field input::placeholder { color: var(--placeholder); opacity: 1; }
 .field input:focus, .field select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px #1763b522; }
+.field-error { color: #bd2929; font-size: 14px; }
 .login-panel .field { margin-bottom: 16px; }
 
 .button {
@@ -100,9 +101,6 @@ button { cursor: pointer; }
 .button:hover { background: var(--blue-soft); }
 .button:disabled { cursor: wait; opacity: .65; }
 .login-panel > .button { width: 100%; margin-top: 0; }
-.demo-note { margin: 16px 0 0; color: var(--muted); font-size: 15px; }
-.demo-note code { color: var(--blue); }
-
 .notice {
   margin-top: 22px;
   padding: 16px 26px;
@@ -116,6 +114,15 @@ button { cursor: pointer; }
 
 .notice-error { border-color: #ff7777; background: var(--red-soft); color: #bd2929; }
 .notice-success { border-color: #8bc544; background: var(--green-soft); color: #28530e; }
+.toast {
+  position: fixed;
+  z-index: 1000;
+  top: 24px;
+  right: 24px;
+  width: min(440px, calc(100vw - 48px));
+  margin: 0;
+  box-shadow: 0 8px 24px #25252526;
+}
 
 .topbar {
   display: flex;
@@ -173,6 +180,65 @@ button { cursor: pointer; }
   background: transparent;
   color: var(--blue);
   font-size: 16px;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.pagination-controls .text-button {
+  min-width: 92px;
+  min-height: 40px;
+  padding: 8px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  text-align: center;
+}
+
+.pagination-controls .text-button:hover:not(:disabled) {
+  border-color: var(--blue);
+  background: var(--blue-soft);
+}
+
+.pagination-controls .text-button:focus-visible {
+  outline: 3px solid #1763b544;
+  outline-offset: 2px;
+}
+
+.pagination-controls .text-button:disabled {
+  cursor: not-allowed;
+  opacity: .45;
+}
+
+.pagination-controls .helper-text {
+  text-align: center;
+  font-size: 14px;
+}
+
+.pagination-size {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.pagination-size .helper-text {
+  font-size: 14px;
+}
+
+.pagination-size select {
+  min-height: 38px;
+  padding: 6px 30px 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
 }
 
 .data-list { display: grid; gap: 8px; }

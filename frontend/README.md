@@ -11,10 +11,9 @@ Plain HTML, CSS, and JavaScript frontend for the Spring Boot API. No build step 
    python -m http.server 5500 --directory frontend
    ```
 
-3. Open `http://localhost:5500` in Chrome. Use any non-empty email and password for the **demo-only** sign-in.
-4. Open `http://localhost:5500/?view=staff` to see the staff layout without admin tabs.
+3. Open `http://localhost:5500` in Chrome.
 
-The login is only a visual demo; it does not authenticate users or provide authorization. Do not use it as production authentication.
+The sign-in form is only a visual gate; it does not authenticate users or provide authorization. Do not use it as production authentication.
 
 ## API mapping
 

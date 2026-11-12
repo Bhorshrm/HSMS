@@ -26,7 +26,6 @@
         <input name="password" type="password" placeholder="********" autocomplete="current-password" required>
       </label>
       <button class="button button-outline" type="submit">Sign in</button>
-      <p class="demo-note">Demo sign-in only. Use <code>?view=staff</code> for the staff layout.</p>
     </form>
     <div id="login-message" class="notice notice-error" role="alert" hidden></div>
   </main>
@@ -67,14 +66,26 @@
         </label>
         <label class="field">
           <span>Phone</span>
-          <input name="phone" type="tel" placeholder="9810000001">
+          <input
+            name="phone"
+            type="tel"
+            placeholder="9810000001"
+            inputmode="numeric"
+            pattern="[0-9]{10}"
+            maxlength="10"
+            title="Enter exactly 10 digits."
+            aria-describedby="doctor-phone-error"
+            required>
+          <small id="doctor-phone-error" class="field-error" hidden>Enter exactly 10 digits.</small>
         </label>
         <label class="field field-wide">
-          <span>Doctor type</span>
+          <span>Doctor availability</span>
           <select name="doctorType" required>
-            <option value="STANDARD">Standard</option>
-            <option value="PART_TIME">Limited hours</option>
+            <option value="" disabled selected>Select a schedule</option>
+            <option value="STANDARD">Standard (9:00 AM-6:30 PM)</option>
+            <option value="LIMITED_HOURS">Limited hours (2:00-4:00 PM)</option>
           </select>
+          <small class="helper-text">This schedule is used when assigning appointments.</small>
         </label>
         <button class="button button-outline field-wide" type="submit">Add doctor</button>
       </form>
@@ -107,7 +118,16 @@
         </label>
         <label class="field">
           <span>Phone</span>
-          <input name="phone" type="tel" placeholder="9900000000">
+          <input
+            name="phone"
+            type="tel"
+            placeholder="9900000000"
+            inputmode="numeric"
+            pattern="[0-9]{10}"
+            maxlength="10"
+            title="Enter exactly 10 digits."
+            aria-describedby="patient-phone-error">
+          <small id="patient-phone-error" class="field-error" hidden>Enter exactly 10 digits.</small>
         </label>
         <button class="button button-outline field-wide" type="submit">Add patient</button>
       </form>
@@ -117,6 +137,19 @@
         <button class="text-button" data-refresh="patients" type="button">Refresh</button>
       </div>
       <div id="patients-list" class="data-list" aria-live="polite"></div>
+      <div class="pagination-controls">
+        <button id="patients-prev" class="text-button" type="button">Previous</button>
+        <span id="patients-page-info" class="helper-text" aria-live="polite"></span>
+        <button id="patients-next" class="text-button" type="button">Next</button>
+      </div>
+      <div class="pagination-size">
+        <label class="helper-text" for="patients-size">Rows per page</label>
+        <select id="patients-size">
+          <option value="10" selected>10</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+      </div>
     </section>
 
     <section id="appointments-panel" class="panel view-panel" aria-labelledby="appointments-heading" hidden>
@@ -129,13 +162,24 @@
           </select>
         </label>
         <label class="field">
+          <span>Doctor</span>
+          <select name="doctorId" required>
+            <option value="" disabled selected>Select doctor</option>
+          </select>
+        </label>
+         <!-- <label class="field">
+          <span>Assigned doctor</span>
+          <input id="assigned-doctor" type="text" value="Assigned automatically on booking" readonly>
+      </label> -->
+        <label class="field">
           <span>Appointment date and time</span>
           <input name="appointmentDateTime" type="datetime-local" required>
+          <small id="appointment-datetime-error" class="notice notice-error" hidden></small>
         </label>
         <button class="button button-outline" type="submit">Book appointment</button>
       </form>
       <p id="patient-options-hint" class="helper-text" hidden>Add a patient first to book an appointment.</p>
-      <p class="helper-text">The server assigns the next available standard doctor for this time.</p>
+      <p class="helper-text">Choose a doctor and a time within their availability. Limited-hours doctors are available from 2:00 to 4:00 PM.</p>
       <div id="appointments-feedback" class="notice" role="status" hidden></div>
       <div class="list-heading">
         <h3>Recent bookings</h3>

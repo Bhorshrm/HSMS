@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("/api/appointments")
@@ -19,7 +21,11 @@ public class AppointmentController {
     public AppointmentController(AppointmentService service) {
         this.service = service;
     }
-
+@GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public AppointmentResponse retrieve(@PathVariable Long id) {
+        return service.retrieve(id);
+    }
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public AppointmentResponse create(@Valid @RequestBody AppointmentRequest request) {

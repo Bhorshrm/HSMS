@@ -31,7 +31,13 @@ public class AppointmentService {
         this.doctorService = doctorService;
         this.clinicTimeZone = ZoneId.of(clinicTimeZone);
     }
-
+@Transactional
+    public AppointmentResponse retrieve(
+            Long appointmentId) {
+        return repository.findById(appointmentId)
+                .map(AppointmentResponse::from)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Appointment not found"));
+    }
     @Transactional
     public AppointmentResponse create(
             Long patientId, Long doctorId, LocalDateTime appointmentDateTime) {
